@@ -8,6 +8,7 @@
 {
   "env": {
     "MOPH_C19_API": "https://cloud4.hosxp.net",
+    "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
     "MOPH_USER": "your-username",
     "MOPH_PASSWD": "your-hashed-password",
     "MOPH_HCODE": "your-hcode"
@@ -40,7 +41,7 @@ $ npm run dev
 ```json
 environment:
   - TZ=Asia/Bangkok
-  - MOPH_C19_API=https://cloud4.hosxp.net
+  - MOPH_C19_API=https://cloud4.hosxp.net # do not config MOPH_C19_AUTH in production
   - MOPH_USER=your-username
   - MOPH_PASSWD=your-hashed-password
   - MOPH_HCODE=your-hcode

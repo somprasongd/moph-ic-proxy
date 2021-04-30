@@ -6,14 +6,12 @@ const cache = require('../cache');
 
 const {
   MOPH_C19_API,
+  MOPH_C19_AUTH,
   MOPH_USER,
   MOPH_PASSWD,
   MOPH_HCODE,
   TOKEN_KEY
 } = require('../config');
-
-
-
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -34,7 +32,7 @@ instance.interceptors.request.use(async (config) => {
 
   if (token === null) {
     try {
-      const url = `${MOPH_C19_API}/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
+      const url = `${MOPH_C19_AUTH}/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
       const response = await axios.get(url, {
         httpsAgent,
       });
