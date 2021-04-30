@@ -1,0 +1,24 @@
+version: '2.4'
+
+services:
+  redis:
+    container_name: moph-proxy-redis
+    image: 'redis:alpine'
+    ports:
+      - '${MOPHPROXY_REDIS_PORT:-6379}:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 15s
+      timeout: 10s
+      retries: 3
+    networks:
+      - moph-proxy-backend
+
+  # moph-c19-proxy:
+  #   container_name: moph-c19-proxy
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+
+networks:
+  moph-proxy-backend:

@@ -1,0 +1,8 @@
+{
+  "env": {
+    "MOPH_C19_API": "https://cloud4.hosxp.net",
+    "MOPH_USER": "your-username",
+    "MOPH_PASSWD": "your-hashed-password",
+    "MOPH_HCODE": "your-hcode"
+  }
+}

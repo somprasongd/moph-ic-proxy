@@ -1,0 +1,26 @@
+version: '2.4'
+
+services:
+  moph-c19-proxy:
+    container_name: moph-c19-proxy
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: registry.opensource-technology.com/moph-c19-proxy:${IMAGE_TAG:-latest}
+    ports:
+      - '${MOPHPROXY_PORT:-9090}:3000'
+    environment:
+      - TZ=Asia/Bangkok
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MOPH_C19_API=https://cvp1.moph.go.th
+      - MOPH_USER=your-user
+      - MOPH_PASSWD=your-password
+      - MOPH_HCODE=your-hcode
+    networks:
+      - webproxy
+      - moph-proxy-backend
+
+networks:
+  webproxy:
+    external: true
