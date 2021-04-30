@@ -1,20 +1,32 @@
 const express = require('express');
+const morgan = require('morgan')
 const config = require('./config');
 const routerProxy = require('./api/proxy');
+const useAuth = require('./middleware/use-auth');
 const redisClient = require('./cache');
+const keygen = require('./helper/keygen');
 
 async function main() {
   try {
     await redisClient.createClient();
   } catch (error) {
-    console.log(`Fatal error: ${error.message}`);
+    throw new Error(`Fatal error: ${error.message}`)
   }
 
   const app = express();
+
+  try {
+    await keygen.init(app);
+  } catch (error) {
+    throw new Error(`Fatal error: ${error.message}`)
+  }
+
+  // use middlewares
+  app.use(morgan(':method :url :status - :response-time ms'));
   // parse body to json
   app.use(express.json());
 
-  app.use(routerProxy);
+  app.use(useAuth.validateApikey, routerProxy);
 
   // handle 404
   app.use((req, res, next) => {
