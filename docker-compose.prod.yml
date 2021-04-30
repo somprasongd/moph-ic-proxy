@@ -14,6 +14,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MOPH_C19_API=https://cvp1.moph.go.th
+      - MOPH_C19_AUTH_SECRET=secret_key
       - MOPH_USER=your-user
       - MOPH_PASSWD=your-password
       - MOPH_HCODE=your-hcode
