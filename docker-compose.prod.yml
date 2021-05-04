@@ -15,9 +15,14 @@ services:
       - TZ=Asia/Bangkok
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    volumes:
+      - authorized_key:/app/.authorized_key
     networks:
       - webproxy
       - moph-proxy-backend
+
+volumes:
+  authorized_key:
 
 networks:
   webproxy:
