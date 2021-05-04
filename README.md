@@ -2,7 +2,7 @@
 
 ## Development
 
-- Set env rename `nodemon.example.jso` to `nodemon.json` and config with your data
+- Set env rename `nodemon.example.json` to `nodemon.json` and config with your data
 
 ```json
 {
@@ -37,16 +37,14 @@ $ npm run dev
 
 ## Production
 
-- Change environtment with your data in `docker-compose.prod.yml`
+- Create `moph-c19-proxy.env` file
 
-```json
-environment:
-  - TZ=Asia/Bangkok
-  - MOPH_C19_API=https://cloud4.hosxp.net # do not config MOPH_C19_AUTH in production
-  - MOPH_C19_AUTH_SECRET=secret_key
-  - MOPH_USER=your-username
-  - MOPH_PASSWD=your-hashed-password
-  - MOPH_HCODE=your-hcode
+```env
+MOPH_C19_API=https://cvp1.moph.go.th
+MOPH_C19_AUTH_SECRET=secret_key
+MOPH_USER=your-user
+MOPH_PASSWD=your-password
+MOPH_HCODE=your-hcode
 ```
 
 - To deploy with this production Compose file you can run

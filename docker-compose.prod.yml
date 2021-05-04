@@ -9,15 +9,12 @@ services:
     image: registry.opensource-technology.com/moph-c19-proxy:${IMAGE_TAG:-latest}
     ports:
       - '${MOPHPROXY_PORT:-9090}:3000'
+    env_file:
+      - moph-c19-proxy.env
     environment:
       - TZ=Asia/Bangkok
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MOPH_C19_API=https://cvp1.moph.go.th
-      - MOPH_C19_AUTH_SECRET=secret_key
-      - MOPH_USER=your-user
-      - MOPH_PASSWD=your-password
-      - MOPH_HCODE=your-hcode
     networks:
       - webproxy
       - moph-proxy-backend
