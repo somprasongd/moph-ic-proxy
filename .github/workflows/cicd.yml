@@ -29,6 +29,6 @@ jobs:
           key: ${{ secrets.DEV_SERVER_KEY }}
           port: ${{ secrets.DEV_SERVER_PORT }}
           script: |
-            cd moph-ic-proxy
+            cd docker/moph-ic-proxy
             docker-compose pull
             docker-compose up -d moph-ic-proxy
