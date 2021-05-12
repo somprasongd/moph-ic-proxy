@@ -5,11 +5,12 @@ ENV NODE_ENV=production
 EXPOSE 3000
 # Define working directory and copy source
 WORKDIR /app
-RUN mkdir .authorized_key
+RUN mkdir .authorized_key && \
+    apk add --no-cache tzdata
 VOLUME /app/.authorized_key
 COPY ./package* ./
 RUN npm ci && \
-  npm cache clean --force
+    npm cache clean --force
 COPY ./src ./src
 # Start the app
 CMD ["node", "src/index.js"]
