@@ -22,7 +22,7 @@ async function main() {
   }
 
   // use middlewares
-  app.use(morgan(':method :url :status - :response-time ms'));
+  app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status - :response-time ms'));
   // parse body to json
   app.use(express.json());
 
@@ -45,33 +45,26 @@ async function main() {
         message: 'Something went wrong',
       },
     };
-    if (app.get('env') === 'development') {
-      console.log('Error config', error.config);
-    }
+    console.log('Error config:\n', error.config);
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      if (app.get('env') === 'development') {
-        console.log('Error response');
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      }
-      json.error.statusCode = error.response.status;
-      json.error.message = JSON.stringify(error.response.data);
+      console.log('Error response status:', error.response.status);
+      console.log('Error response headers:\n', error.response.headers);
+      console.log('Error response data:\n', error.response.data);
+      // json.error.statusCode = error.response.status;
+      // json.error.message = JSON.stringify(error.response.data);
+      res.set(error.response.headers);
+      res.status(error.response.status).send(error.response.data);
+      return;
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
-      if (app.get('env') === 'development') {
-        console.log('Error request');
-        console.log(error.request);
-      }
+      console.log('Error request:\n', error.request);
     } else {
       // Something happened in setting up the request that triggered an Error
-      if (app.get('env') === 'development') {
-        console.log('Error', error.message);
-      }
+      console.log('Error:\n', error.message);
       json.error.statusCode = error.statusCode;
       json.error.message = error.message;
     }

@@ -13,7 +13,7 @@ router.get('*', async (req, res, next) => {
 
   try {
     const respone = await httpClient.get(url);
-    return res.json(respone.data);
+    return res.send(respone.data);
   } catch (error) {
     next(error);
   }
@@ -30,7 +30,7 @@ router.post('*', async (req, res, next) => {
 
   try {
     const respone = await httpClient.post(url, json);
-    return res.json(respone.data);
+    return res.send(respone.data);
   } catch (error) {
     next(error);
   }

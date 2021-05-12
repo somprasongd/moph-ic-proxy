@@ -1,5 +1,6 @@
 FROM node:14.15.0-alpine
 LABEL maintainer="somprasong.damyos@gmail.com"
+ENV NODE_ENV=production
 # Expose ports (for orchestrators and dynamic reverse proxies)
 EXPOSE 3000
 # Define working directory and copy source
