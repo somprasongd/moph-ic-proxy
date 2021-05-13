@@ -1,5 +1,9 @@
 # MOPH Proxy API
 
+## MOPH IC API Document
+
+https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/edit
+
 ## Development
 
 - Set env rename `nodemon.example.json` to `nodemon.json` and config with your data
@@ -11,7 +15,7 @@
     "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
     "MOPH_C19_AUTH_SECRET": "secret_key",
     "MOPH_USER": "your-username",
-    "MOPH_PASSWD": "your-hashed-password",
+    "MOPH_PASSWD": "your-password",
     "MOPH_HCODE": "your-hcode"
   }
 }
@@ -37,7 +41,7 @@ $ npm run dev
 
 ## Production
 
-- Create `moph-c19-proxy.env` file
+- Create `moph-ic-proxy.env` file
 
 ```env
 MOPH_C19_API=https://cvp1.moph.go.th
