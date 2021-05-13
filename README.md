@@ -60,3 +60,13 @@ $ docker network create webproxy
 # deploy
 $ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
+
+## How to use
+
+Call api from `http://your-server-ip:port/api/XXX?x-api-key=moph-ic-proxy-api-key&AAA=yyyy&BBB=zzzz`
+
+>XXX is MOPH IC api endpoint
+
+>AAA, BBB is MOPH IC api query parameters
+
+>moph-ic-proxy-api get from log when start server
