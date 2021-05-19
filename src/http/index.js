@@ -39,7 +39,7 @@ instance.interceptors.request.use(async (config) => {
       token = response.data;
       const decoded = jwt_decode(token);
 
-      cache.setex('token', token, decoded.exp);
+      cache.setex('token', token, decoded.exp - 60); // set expire before 60s
     } catch (error) {
       console.error(error);
       token = '';
