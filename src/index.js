@@ -5,8 +5,10 @@ const routerProxy = require('./api/proxy');
 const useAuth = require('./middleware/use-auth');
 const redisClient = require('./cache');
 const keygen = require('./helper/keygen');
+const pkgJson = require('../package.json');
 
 async function main() {
+  console.log(`MOPH IC Proxy v.${pkgJson.version}`);
   try {
     await redisClient.createClient();
   } catch (error) {
