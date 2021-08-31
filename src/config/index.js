@@ -13,7 +13,6 @@ const USE_API_KEY = process.env.USE_API_KEY
   ? process.env.USE_API_KEY === 'true'
   : true;
 const TOKEN_KEY = 'token';
-console.log(USE_API_KEY);
 
 const requireds = [
   'MOPH_C19_API',
