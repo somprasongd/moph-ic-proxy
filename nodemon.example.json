@@ -5,6 +5,7 @@
     "MOPH_C19_AUTH_SECRET": "secret_key",
     "MOPH_USER": "your-username",
     "MOPH_PASSWD": "your-hashed-password",
-    "MOPH_HCODE": "your-hcode"
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": true
   }
 }

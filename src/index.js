@@ -1,5 +1,5 @@
 const express = require('express');
-const morgan = require('morgan')
+const morgan = require('morgan');
 const config = require('./config');
 const routerProxy = require('./api/proxy');
 const useAuth = require('./middleware/use-auth');
@@ -12,19 +12,25 @@ async function main() {
   try {
     await redisClient.createClient();
   } catch (error) {
-    throw new Error(`Fatal error: ${error.message}`)
+    throw new Error(`Fatal error: ${error.message}`);
   }
 
   const app = express();
 
-  try {
-    await keygen.init(app);
-  } catch (error) {
-    throw new Error(`Fatal error: ${error.message}`)
+  if (config.USE_API_KEY) {
+    try {
+      await keygen.init(app);
+    } catch (error) {
+      throw new Error(`Fatal error: ${error.message}`);
+    }
   }
 
   // use middlewares
-  app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status - :response-time ms'));
+  app.use(
+    morgan(
+      ':remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status - :response-time ms'
+    )
+  );
   // parse body to json
   app.use(express.json());
 
