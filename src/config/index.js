@@ -9,9 +9,11 @@ const MOPH_C19_AUTH_SECRET = process.env.MOPH_C19_AUTH_SECRET || '$jwt@moph#';
 const MOPH_USER = process.env.MOPH_USER;
 const MOPH_PASSWD = process.env.MOPH_PASSWD;
 const MOPH_HCODE = process.env.MOPH_HCODE;
-const USE_API_KEY =
-  (process.env.USE_API_KEY && process.env.USE_API_KEY === 'true') || true;
+const USE_API_KEY = process.env.USE_API_KEY
+  ? process.env.USE_API_KEY === 'true'
+  : true;
 const TOKEN_KEY = 'token';
+console.log(USE_API_KEY);
 
 const requireds = [
   'MOPH_C19_API',
