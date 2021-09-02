@@ -6,6 +6,7 @@ services:
     image: 'redis:alpine'
     ports:
       - '${MOPHPROXY_REDIS_PORT:-6379}:6379'
+    # command: redis-server --requirepass sOmE_sEcUrE_pAsS
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 15s
