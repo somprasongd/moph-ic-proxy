@@ -6,11 +6,16 @@ let redisClient;
 
 const createClient = () =>
   new Promise((resolve, reject) => {
-    redisClient = redis.createClient({
+    const option = {
       host: REDIS_HOST,
       port: REDIS_PORT,
-      password: REDIS_PASSWORD,
-    });
+    };
+
+    if (REDIS_PASSWORD) {
+      option.password = REDIS_PASSWORD;
+    }
+
+    redisClient = redis.createClient(option);
 
     redisClient.on('connect', function () {
       console.log('Redis: connected.');
