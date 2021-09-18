@@ -59,9 +59,9 @@ instance.interceptors.request.use(async (config) => {
   return config;
 });
 
-instance.interceptors.response.use(null, (error) => {
+instance.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
-    const token = await getToken({ force = true });
+    const token = await getToken({ force: true });
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);
   }
