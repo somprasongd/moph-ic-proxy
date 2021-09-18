@@ -10,7 +10,7 @@ const {
   MOPH_USER,
   MOPH_PASSWD,
   MOPH_HCODE,
-  TOKEN_KEY
+  TOKEN_KEY,
 } = require('../config');
 
 const httpsAgent = new https.Agent({
@@ -27,9 +27,13 @@ const defaultOptions = {
 
 const instance = axios.create(defaultOptions);
 
-instance.interceptors.request.use(async (config) => {
-  let token = await cache.get(TOKEN_KEY);
-
+async function getToken({ force = false }) {
+  let token = null;
+  if (force) {
+    await cache.del(TOKEN_KEY);
+  } else {
+    token = await cache.get(TOKEN_KEY);
+  }
   if (token === null) {
     try {
       const url = `${MOPH_C19_AUTH}/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
@@ -45,9 +49,24 @@ instance.interceptors.request.use(async (config) => {
       token = '';
     }
   }
-  
+  return token;
+}
+
+instance.interceptors.request.use(async (config) => {
+  const token = await getToken();
+
   config.headers.Authorization = `Bearer ${token}`;
   return config;
+});
+
+instance.interceptors.response.use(null, (error) => {
+  if (error.config && error.response && error.response.status === 401) {
+    const token = await getToken({ force = true });
+    error.config.headers.Authorization = `Bearer ${token}`;
+    return axios.request(error.config);
+  }
+
+  return Promise.reject(error);
 });
 
 module.exports = instance;
