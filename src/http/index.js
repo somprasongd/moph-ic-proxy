@@ -27,9 +27,9 @@ const defaultOptions = {
 
 const instance = axios.create(defaultOptions);
 
-async function getToken({ force = false }) {
+async function getToken(options = { force: false }) {
   let token = null;
-  if (force) {
+  if (options.force) {
     await cache.del(TOKEN_KEY);
   } else {
     token = await cache.get(TOKEN_KEY);
