@@ -1,6 +1,6 @@
 const express = require('express');
 const queryString = require('query-string');
-const httpClient = require('../http');
+const http = require('../http');
 const cache = require('../cache');
 
 const router = express.Router();
@@ -13,14 +13,14 @@ router.get('*', async (req, res, next) => {
   }`;
 
   try {
-    const respone = await httpClient.get(url);
+    const respone = await http.client.get(url);
     return res.send(respone.data);
   } catch (error) {
     if (error.response && error.response.Message === 'JWT Expire') {
       cache.del('token');
       // retry
       try {
-        const respone = await httpClient.get(url);
+        const respone = await http.client.get(url);
         return res.send(respone.data);
       } catch (error) {
         return next(error);
@@ -40,14 +40,14 @@ router.post('*', async (req, res, next) => {
   }`;
 
   try {
-    const respone = await httpClient.post(url, json);
+    const respone = await http.client.post(url, json);
     return res.send(respone.data);
   } catch (error) {
     if (error.response && error.response.Message === 'JWT Expire') {
       cache.del('token');
       // retry
       try {
-        const respone = await httpClient.post(url, json);
+        const respone = await http.client.post(url, json);
         return res.send(respone.data);
       } catch (error) {
         return next(error);

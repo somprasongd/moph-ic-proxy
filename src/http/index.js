@@ -40,7 +40,10 @@ axiosRetry(getTokenClient, {
 async function getToken(options = { force: false }) {
   console.log('gettoken with options:', options);
   let token = options.force ? null : await cache.get(TOKEN_KEY);
-  console.log('token from cache:', token === '' ? 'no token' : 'have token');
+  console.log(
+    'token from cache:',
+    token === null || token === '' ? 'no token' : 'have token'
+  );
   if (token === null || token === '') {
     try {
       const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
@@ -79,4 +82,4 @@ instance.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
-module.exports = instance;
+module.exports = { client: instance, getToken };

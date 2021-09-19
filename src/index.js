@@ -6,6 +6,7 @@ const useAuth = require('./middleware/use-auth');
 const redisClient = require('./cache');
 const keygen = require('./helper/keygen');
 const pkgJson = require('../package.json');
+const http = require('./http');
 
 async function main() {
   console.log(`MOPH IC Proxy v.${pkgJson.version}`);
@@ -24,7 +25,7 @@ async function main() {
       throw new Error(`Fatal error: ${error.message}`);
     }
   }
-
+  http.getToken({ force: true });
   // use middlewares
   app.use(
     morgan(
