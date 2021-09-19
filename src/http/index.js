@@ -38,13 +38,16 @@ axiosRetry(getTokenClient, {
 });
 
 async function getToken(options = { force: false }) {
+  console.log('gettoken with options:', options);
   let token = options.force ? null : await cache.get(TOKEN_KEY);
+  console.log('token from cache:', token === '' ? 'no token' : 'have token');
   if (token === null || token === '') {
     try {
       const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
       const response = await getTokenClient.get(url);
       token = response.data;
       const decoded = jwt_decode(token);
+      console.log('new token exp:', decoded.exp, decoded.exp - 60);
 
       cache.setex('token', token, decoded.exp - 60); // set expire before 60s
     } catch (error) {
@@ -57,15 +60,19 @@ async function getToken(options = { force: false }) {
 
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
-
+  // console.log('interceptors.request', `Bearer ${token}`);
   config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
 instance.interceptors.response.use(null, async (error) => {
+  console.log('res status:', error?.response?.status);
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
+
+    // console.log('interceptors.response', `Bearer ${token}`);
     error.config.headers.Authorization = `Bearer ${token}`;
+    console.log('Retry from interceptors.response');
     return axios.request(error.config);
   }
 
