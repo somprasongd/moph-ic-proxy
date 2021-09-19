@@ -38,19 +38,19 @@ axiosRetry(getTokenClient, {
 });
 
 async function getToken(options = { force: false }) {
-  console.log('gettoken with options:', options);
+  // console.log('gettoken with options:', options);
   let token = options.force ? null : await cache.get(TOKEN_KEY);
-  console.log(
-    'token from cache:',
-    token === null || token === '' ? 'no token' : 'have token'
-  );
+  // console.log(
+  //   'token from cache:',
+  //   token === null || token === '' ? 'no token' : 'have token'
+  // );
   if (token === null || token === '') {
     try {
       const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
       const response = await getTokenClient.get(url);
       token = response.data;
       const decoded = jwt_decode(token);
-      console.log('new token exp:', decoded.exp, decoded.exp - 60);
+      console.log('New mophic token exp at', decoded.exp);
 
       cache.setex('token', token, decoded.exp - 60); // set expire before 60s
     } catch (error) {
@@ -75,7 +75,7 @@ instance.interceptors.response.use(null, async (error) => {
 
     // console.log('interceptors.response', `Bearer ${token}`);
     error.config.headers.Authorization = `Bearer ${token}`;
-    console.log('Retry from interceptors.response');
+    // console.log('Retry from interceptors.response');
     return axios.request(error.config);
   }
 
