@@ -1,4 +1,5 @@
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const https = require('https');
 const jwt_decode = require('jwt-decode');
 
@@ -27,19 +28,21 @@ const defaultOptions = {
 
 const instance = axios.create(defaultOptions);
 
+const getTokenClient = axios.create({
+  baseURL: MOPH_C19_AUTH,
+  httpsAgent,
+});
+axiosRetry(getTokenClient, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+});
+
 async function getToken(options = { force: false }) {
-  let token = null;
-  if (options.force) {
-    await cache.del(TOKEN_KEY);
-  } else {
-    token = await cache.get(TOKEN_KEY);
-  }
-  if (token === null) {
+  let token = options.force ? null : await cache.get(TOKEN_KEY);
+  if (token === null || token === '') {
     try {
-      const url = `${MOPH_C19_AUTH}/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
-      const response = await axios.get(url, {
-        httpsAgent,
-      });
+      const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
+      const response = await getTokenClient.get(url);
       token = response.data;
       const decoded = jwt_decode(token);
 
