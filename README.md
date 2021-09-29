@@ -16,7 +16,8 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
     "MOPH_C19_AUTH_SECRET": "secret_key",
     "MOPH_USER": "your-username",
     "MOPH_PASSWD": "your-password",
-    "MOPH_HCODE": "your-hcode"
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": "true_or_false_default_is_true"
   }
 }
 ```
@@ -49,6 +50,7 @@ MOPH_C19_AUTH_SECRET=secret_key
 MOPH_USER=your-user
 MOPH_PASSWD=your-password
 MOPH_HCODE=your-hcode
+USE_API_KEY=true_or_false_default_is_true
 ```
 
 - To deploy with this production Compose file you can run
@@ -65,8 +67,18 @@ $ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 Call api from `http://your-server-ip:port/api/XXX?x-api-key=moph-ic-proxy-api-key&AAA=yyyy&BBB=zzzz`
 
->XXX is MOPH IC api endpoint
+If set `USE_API_KEY=false` call `http://your-server-ip:port/api/XXX?AAA=yyyy&BBB=zzzz`
 
->AAA, BBB is MOPH IC api query parameters
+```
+http://localhost:9090/api/ImmunizationTarget?x-api-key=ETB4VPB-HJ4MEFA-MJ356Q5-HC3B87B&cid=1659900783037
 
->moph-ic-proxy-api get from log when start server
+# OR
+
+http://localhost:9090/api/ImmunizationTarget?cid=1659900783037
+```
+
+> XXX is MOPH IC api endpoint
+
+> AAA, BBB is MOPH IC api query parameters
+
+> moph-ic-proxy-api get from log when start server

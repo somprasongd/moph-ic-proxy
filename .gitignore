@@ -6,3 +6,5 @@ nodemon.json
 
 # api key
 .access.key
+
+cid.txt
