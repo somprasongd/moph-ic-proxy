@@ -4,6 +4,7 @@ const APP_PORT = process.env.APP_PORT || 3000;
 const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 const REDIS_PORT = process.env.REDIS_PORT || 6379;
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
+const EPIDEM_API = process.env.EPIDEM_API || null;
 const MOPH_C19_API = process.env.MOPH_C19_API;
 const MOPH_C19_AUTH = process.env.MOPH_C19_AUTH || process.env.MOPH_C19_API;
 const MOPH_C19_AUTH_SECRET = process.env.MOPH_C19_AUTH_SECRET || '$jwt@moph#';
@@ -48,6 +49,7 @@ module.exports = {
   REDIS_PORT,
   REDIS_PASSWORD,
   TOKEN_KEY,
+  EPIDEM_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
   MOPH_USER,

@@ -11,6 +11,7 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
 ```json
 {
   "env": {
+    "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
     "MOPH_C19_API": "https://cloud4.hosxp.net",
     "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
     "MOPH_C19_AUTH_SECRET": "secret_key",

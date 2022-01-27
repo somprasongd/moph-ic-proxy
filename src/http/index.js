@@ -6,6 +6,7 @@ const jwt_decode = require('jwt-decode');
 const cache = require('../cache');
 
 const {
+  EPIDEM_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
   MOPH_USER,
@@ -17,16 +18,6 @@ const {
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
 });
-
-const defaultOptions = {
-  baseURL: MOPH_C19_API,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  httpsAgent,
-};
-
-const instance = axios.create(defaultOptions);
 
 const getTokenClient = axios.create({
   baseURL: MOPH_C19_AUTH,
@@ -61,6 +52,16 @@ async function getToken(options = { force: false }) {
   return token;
 }
 
+const defaultOptions = {
+  baseURL: MOPH_C19_API,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  httpsAgent,
+};
+
+const instance = axios.create(defaultOptions);
+
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
   // console.log('interceptors.request', `Bearer ${token}`);
@@ -69,7 +70,6 @@ instance.interceptors.request.use(async (config) => {
 });
 
 instance.interceptors.response.use(null, async (error) => {
-  console.log('res status:', error?.response?.status);
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
 
@@ -82,4 +82,48 @@ instance.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
-module.exports = { client: instance, getToken };
+const epidemOptions = {
+  baseURL: EPIDEM_API,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  httpsAgent,
+};
+
+const instanceEpidem = axios.create(epidemOptions);
+
+instanceEpidem.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  // console.log('interceptors.request', `Bearer ${token}`);
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+instanceEpidem.interceptors.response.use(null, async (error) => {
+  if (error.config && error.response && error.response.status === 401) {
+    const token = await getToken({ force: true });
+
+    // console.log('interceptors.response', `Bearer ${token}`);
+    error.config.headers.Authorization = `Bearer ${token}`;
+    // console.log('Retry from interceptors.response');
+    return axios.request(error.config);
+  }
+
+  return Promise.reject(error);
+});
+
+function getClient(endpoint = 'mophic') {
+  switch (endpoint) {
+    case 'epidem':
+      return instanceEpidem;
+    default:
+      return instance;
+  }
+}
+
+module.exports = {
+  client: instance,
+  clientEpidem: instanceEpidem,
+  getToken,
+  getClient,
+};
