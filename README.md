@@ -11,6 +11,8 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
 ```json
 {
   "env": {
+    "MOPH_CLAIM_API": "https://uat-moph-nhso.inet.co.th",
+    "MOPH_PHR_API": "https://phr1.moph.go.th",
     "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
     "MOPH_C19_API": "https://cloud4.hosxp.net",
     "MOPH_C19_AUTH": "https://cvp1.moph.go.th",

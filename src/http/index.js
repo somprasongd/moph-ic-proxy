@@ -6,6 +6,8 @@ const jwt_decode = require('jwt-decode');
 const cache = require('../cache');
 
 const {
+  MOPH_CLAIM_API,
+  MOPH_PHR_API,
   EPIDEM_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
@@ -112,10 +114,66 @@ instanceEpidem.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
+const phrOptions = {
+  baseURL: MOPH_PHR_API,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  httpsAgent,
+};
+
+const instancePhr = axios.create(phrOptions);
+
+instancePhr.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+instancePhr.interceptors.response.use(null, async (error) => {
+  if (error.config && error.response && error.response.status === 401) {
+    const token = await getToken({ force: true });
+    error.config.headers.Authorization = `Bearer ${token}`;
+    return axios.request(error.config);
+  }
+
+  return Promise.reject(error);
+});
+
+const claimOptions = {
+  baseURL: MOPH_CLAIM_API,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  httpsAgent,
+};
+
+const instanceClaim = axios.create(claimOptions);
+
+instanceClaim.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+instanceClaim.interceptors.response.use(null, async (error) => {
+  if (error.config && error.response && error.response.status === 401) {
+    const token = await getToken({ force: true });
+    error.config.headers.Authorization = `Bearer ${token}`;
+    return axios.request(error.config);
+  }
+
+  return Promise.reject(error);
+});
+
 function getClient(endpoint = 'mophic') {
   switch (endpoint) {
     case 'epidem':
       return instanceEpidem;
+    case 'phr':
+      return instancePhr;
+    case 'claim':
+      return instanceClaim;
     default:
       return instance;
   }
@@ -124,6 +182,8 @@ function getClient(endpoint = 'mophic') {
 module.exports = {
   client: instance,
   clientEpidem: instanceEpidem,
+  clientPhr: instanceClaim,
+  clientClaim: instancePhr,
   getToken,
   getClient,
 };
