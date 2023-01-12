@@ -131,7 +131,7 @@ instancePhr.interceptors.request.use(async (config) => {
 });
 
 instancePhr.interceptors.response.use(null, async (error) => {
-  if (error.config && error.response && error.response.status === 401) {
+  if (error.config && error.response && error.response.status === 501) {
     const token = await getToken({ force: true });
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);
