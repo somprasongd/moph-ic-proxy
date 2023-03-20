@@ -70,22 +70,14 @@ const defaultOptions = {
 
 const instance = axios.create(defaultOptions);
 
-const controller = new AbortController();
+// const controller = new AbortController();
 
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
 
-  if (!token) {
-    controller.abort();
-  } else {
-    // console.log('interceptors.request', `Bearer ${token}`);
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return {
-    ...config,
-    signal: controller.signal,
-  };
+  // console.log('interceptors.request', `Bearer ${token}`);
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
 });
 
 instance.interceptors.response.use(null, async (error) => {
