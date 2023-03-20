@@ -39,8 +39,14 @@ async function getToken(options = { force: false }) {
   // );
   if (token === null || token === '') {
     try {
-      const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
-      const response = await getTokenClient.get(url);
+      // const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
+      const url = `/token?Action=get_moph_access_token`;
+      const payload = {
+        user: MOPH_USER,
+        password_hash: MOPH_PASSWD,
+        hospital_code: MOPH_HCODE,
+      };
+      const response = await getTokenClient.post(url, payload);
       token = response.data;
       const decoded = jwt_decode(token);
       console.log('New mophic token exp at', decoded.exp);
@@ -64,16 +70,30 @@ const defaultOptions = {
 
 const instance = axios.create(defaultOptions);
 
+const controller = new AbortController();
+
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
-  // console.log('interceptors.request', `Bearer ${token}`);
-  config.headers.Authorization = `Bearer ${token}`;
-  return config;
+
+  if (!token) {
+    controller.abort();
+  } else {
+    // console.log('interceptors.request', `Bearer ${token}`);
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return {
+    ...config,
+    signal: controller.signal,
+  };
 });
 
 instance.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
+    if (!token) {
+      return Promise.reject(error);
+    }
 
     // console.log('interceptors.response', `Bearer ${token}`);
     error.config.headers.Authorization = `Bearer ${token}`;
@@ -131,7 +151,11 @@ instancePhr.interceptors.request.use(async (config) => {
 });
 
 instancePhr.interceptors.response.use(null, async (error) => {
-  if (error.config && error.response && (error.response.status === 401 || error.response.status === 501)) {
+  if (
+    error.config &&
+    error.response &&
+    (error.response.status === 401 || error.response.status === 501)
+  ) {
     const token = await getToken({ force: true });
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);
