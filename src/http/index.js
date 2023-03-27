@@ -54,7 +54,6 @@ async function getToken(options = { force: false }) {
       cache.setex('token', token, decoded.exp - 60); // set expire before 60s
     } catch (error) {
       console.error(error);
-      token = '';
     }
   }
   return token;
@@ -74,6 +73,9 @@ const instance = axios.create(defaultOptions);
 
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
+  if (!token) {
+    return Promise.reject({ message: 'no token' });
+  }
 
   // console.log('interceptors.request', `Bearer ${token}`);
   config.headers.Authorization = `Bearer ${token}`;
@@ -84,12 +86,13 @@ instance.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
     if (!token) {
+      console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);
     }
 
     // console.log('interceptors.response', `Bearer ${token}`);
     error.config.headers.Authorization = `Bearer ${token}`;
-    // console.log('Retry from interceptors.response');
+    console.log('Retry from interceptors.response');
     return axios.request(error.config);
   }
 
@@ -108,6 +111,9 @@ const instanceEpidem = axios.create(epidemOptions);
 
 instanceEpidem.interceptors.request.use(async (config) => {
   const token = await getToken();
+  if (!token) {
+    return Promise.reject({ message: 'no token' });
+  }
   // console.log('interceptors.request', `Bearer ${token}`);
   config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -116,6 +122,10 @@ instanceEpidem.interceptors.request.use(async (config) => {
 instanceEpidem.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
+    if (!token) {
+      console.log('Cancal Retry from interceptors.response', error);
+      return Promise.reject(error);
+    }
 
     // console.log('interceptors.response', `Bearer ${token}`);
     error.config.headers.Authorization = `Bearer ${token}`;
@@ -138,6 +148,9 @@ const instancePhr = axios.create(phrOptions);
 
 instancePhr.interceptors.request.use(async (config) => {
   const token = await getToken();
+  if (!token) {
+    return Promise.reject({ message: 'no token' });
+  }
   config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -149,6 +162,10 @@ instancePhr.interceptors.response.use(null, async (error) => {
     (error.response.status === 401 || error.response.status === 501)
   ) {
     const token = await getToken({ force: true });
+    if (!token) {
+      console.log('Cancal Retry from interceptors.response', error);
+      return Promise.reject(error);
+    }
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);
   }
@@ -168,6 +185,9 @@ const instanceClaim = axios.create(claimOptions);
 
 instanceClaim.interceptors.request.use(async (config) => {
   const token = await getToken();
+  if (!token) {
+    return Promise.reject({ message: 'no token' });
+  }
   config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -175,6 +195,10 @@ instanceClaim.interceptors.request.use(async (config) => {
 instanceClaim.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
     const token = await getToken({ force: true });
+    if (!token) {
+      console.log('Cancal Retry from interceptors.response', error);
+      return Promise.reject(error);
+    }
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);
   }
