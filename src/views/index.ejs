@@ -21,6 +21,14 @@
       >
         Change Password
       </button>
+      <% if (useApiKey) { %>
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+        onclick="window.location.href='/api-key'"
+      >
+        Show API Key
+      </button>
+      <% } %>
       <div class="flex flex-wrap justify-center">
         <% for (let i = 0; i < apis.length; i++) { %>
         <div class="w-full lg:w-1/2 p-2">

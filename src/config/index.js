@@ -10,13 +10,14 @@ const EPIDEM_API = process.env.EPIDEM_API || null;
 const MOPH_C19_API = process.env.MOPH_C19_API;
 const MOPH_C19_AUTH = process.env.MOPH_C19_AUTH || process.env.MOPH_C19_API;
 const MOPH_C19_AUTH_SECRET = process.env.MOPH_C19_AUTH_SECRET || '$jwt@moph#';
-const MOPH_USER = process.env.MOPH_USER;
-const MOPH_PASSWD = process.env.MOPH_PASSWD;
+// const MOPH_USER = process.env.MOPH_USER;
+// const MOPH_PASSWD = process.env.MOPH_PASSWD;
 const MOPH_HCODE = process.env.MOPH_HCODE;
 const USE_API_KEY = process.env.USE_API_KEY
   ? process.env.USE_API_KEY === 'true'
   : true;
-const TOKEN_KEY = 'token';
+const TOKEN_KEY = 'moph-ic-token';
+const AUTH_PAYLOAD_KEY = 'moph-ic-auth-payload';
 
 const requireds = [
   'MOPH_C19_API',
@@ -40,10 +41,10 @@ if (errors.length > 0) {
   );
 }
 
-// hash password
-const hash = createHmac('sha256', MOPH_C19_AUTH_SECRET)
-  .update(MOPH_PASSWD)
-  .digest('hex');
+// // hash password
+// const hash = createHmac('sha256', MOPH_C19_AUTH_SECRET)
+//   .update(MOPH_PASSWD)
+//   .digest('hex');
 
 module.exports = {
   APP_PORT,
@@ -51,13 +52,13 @@ module.exports = {
   REDIS_PORT,
   REDIS_PASSWORD,
   TOKEN_KEY,
+  AUTH_PAYLOAD_KEY,
+  MOPH_C19_AUTH_SECRET,
   MOPH_CLAIM_API,
   MOPH_PHR_API,
   EPIDEM_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
-  MOPH_USER,
-  MOPH_PASSWD: hash,
   MOPH_HCODE,
   USE_API_KEY,
 };

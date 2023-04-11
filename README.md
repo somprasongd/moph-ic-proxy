@@ -17,8 +17,6 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
     "MOPH_C19_API": "https://cloud4.hosxp.net",
     "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
     "MOPH_C19_AUTH_SECRET": "secret_key",
-    "MOPH_USER": "your-username",
-    "MOPH_PASSWD": "your-password",
     "MOPH_HCODE": "your-hcode",
     "USE_API_KEY": "true_or_false_default_is_true"
   }
@@ -28,19 +26,19 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
 - Start redis server you can run
 
 ```bash
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 - Install dependencies
 
 ```bash
-$ npm install
+npm install
 ```
 
 - Run dev server
 
 ```bash
-$ npm run dev
+npm run dev
 ```
 
 ## Production
@@ -50,8 +48,6 @@ $ npm run dev
 ```env
 MOPH_C19_API=https://cvp1.moph.go.th
 MOPH_C19_AUTH_SECRET=secret_key
-MOPH_USER=your-user
-MOPH_PASSWD=your-password
 MOPH_HCODE=your-hcode
 USE_API_KEY=true_or_false_default_is_true
 ```
@@ -60,11 +56,19 @@ USE_API_KEY=true_or_false_default_is_true
 
 ```bash
 # create docker network
-$ docker network create webproxy
+docker network create webproxy
 
 # deploy
-$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
+
+- Add Username and Password
+
+Go to `http://your-server-ip:port/change-password`
+
+- Get API Key
+
+Go to `http://your-server-ip:port/api-key` and login with MOPH IC username and password.
 
 ## How to use
 
@@ -72,7 +76,7 @@ Call api from `http://your-server-ip:port/api/XXX?x-api-key=moph-ic-proxy-api-ke
 
 If set `USE_API_KEY=false` call `http://your-server-ip:port/api/XXX?AAA=yyyy&BBB=zzzz`
 
-```
+```text
 http://localhost:9090/api/ImmunizationTarget?x-api-key=ETB4VPB-HJ4MEFA-MJ356Q5-HC3B87B&cid=1659900783037
 
 # OR
