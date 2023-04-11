@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const config = require('./config');
+const routerAuth = require('./api/auth');
 const routerProxy = require('./api/proxy');
 const useAuth = require('./middleware/use-auth');
 const redisClient = require('./cache');
@@ -9,7 +10,8 @@ const pkgJson = require('../package.json');
 const http = require('./http');
 
 async function main() {
-  console.log(`MOPH IC Proxy v.${pkgJson.version}`);
+  const appName = `MOPH IC Proxy v.${pkgJson.version}`;
+  console.log(appName);
   try {
     await redisClient.createClient();
   } catch (error) {
@@ -25,7 +27,7 @@ async function main() {
       throw new Error(`Fatal error: ${error.message}`);
     }
   }
-  http.getToken({ force: true });
+  // http.getToken({ force: true });
   // use middlewares
   app.use(
     morgan(
@@ -33,7 +35,59 @@ async function main() {
     )
   );
   // parse body to json
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+  app.set('x-powered-by', false);
+  // set the view engine to ejs
+  app.set('view engine', 'ejs');
+  app.set('views', process.cwd() + '/src/views');
+
+  app.get('/favicon.ico', (req, res) => res.status(204));
+
+  // home page
+  app.get('/', function (req, res) {
+    res.render('index', {
+      title: appName,
+      useApiKey: config.USE_API_KEY,
+      host: req.protocol + '://' + req.get('host'),
+      apis: [
+        {
+          name: 'MOPH Immunization Center',
+          url: '/api/ImmunizationTarget?cid=xxxxxxxxxxxxx',
+          doc: 'https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/edit',
+        },
+        {
+          name: 'EPIDEM Center',
+          url: '/api/SendEPIDEM?endpoint=epidem',
+          doc: 'https://ddc.moph.go.th/viralpneumonia/file/g_surveillance/g_api_epidem_0165.pdf',
+        },
+        {
+          name: 'MOPH-PHR',
+          url: '/api/RequestTokenv1?endpoint=phr',
+          doc: 'https://docs.google.com/document/d/1ZWCBJnxVCtjqmBGNjj1sLnYv11dVzUvnweui-26NDJ0/edit',
+        },
+        {
+          name: 'Moph Claim-NHSO',
+          url: '/api/v1/opd/service-admissions/dmht?endpoint=claim',
+          doc: 'https://docs.google.com/document/d/1iiybB2y7NJkEhXTdS4DbYe3-Fs7aka7MlEns81lzODQ/edit',
+        },
+      ],
+    });
+  });
+
+  // change password page
+  app.all('/change-password', function (req, res) {
+    if (req.method === 'GET') {
+      res.render('change-password');
+    } else if (req.method === 'POST') {
+      console.log(req.body);
+      res.redirect('/');
+    } else {
+      res.sendStatus(405);
+    }
+  });
+
+  app.use('/api/auth', useAuth.validateApikey, routerAuth);
 
   app.use(useAuth.validateApikey, routerProxy);
 
