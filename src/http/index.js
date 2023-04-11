@@ -3,6 +3,7 @@ const axiosRetry = require('axios-retry');
 const https = require('https');
 const jwt_decode = require('jwt-decode');
 
+const { createAuthPayload } = require('../helper/auth-payload');
 const cache = require('../cache');
 
 const {
@@ -11,10 +12,8 @@ const {
   EPIDEM_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
-  MOPH_USER,
-  MOPH_PASSWD,
-  MOPH_HCODE,
   TOKEN_KEY,
+  AUTH_PAYLOAD_KEY,
 } = require('../config');
 
 const httpsAgent = new https.Agent({
@@ -30,28 +29,40 @@ axiosRetry(getTokenClient, {
   retryDelay: axiosRetry.exponentialDelay,
 });
 
-async function getToken(options = { force: false }) {
+async function getToken(
+  options = { force: false, username: '', password: '' }
+) {
+  const { force = false, username = '', password = '' } = options;
   // console.log('gettoken with options:', options);
-  let token = options.force ? null : await cache.get(TOKEN_KEY);
-  // console.log(
-  //   'token from cache:',
-  //   token === null || token === '' ? 'no token' : 'have token'
-  // );
+  let token = null;
+  if (force) {
+    cache.del('token');
+  } else {
+    token = await cache.get(TOKEN_KEY);
+  }
   if (token === null || token === '') {
     try {
-      // const url = `/token?Action=get_moph_access_token&user=${MOPH_USER}&password_hash=${MOPH_PASSWD}&hospital_code=${MOPH_HCODE}`;
       const url = `/token?Action=get_moph_access_token`;
-      const payload = {
-        user: MOPH_USER,
-        password_hash: MOPH_PASSWD,
-        hospital_code: MOPH_HCODE,
-      };
+      let payload = {};
+      if (username !== '' && password !== '') {
+        payload = createAuthPayload(username, password);
+      } else {
+        const strPayload = await cache.get(AUTH_PAYLOAD_KEY);
+        if (!strPayload) {
+          return null;
+        }
+        payload = JSON.parse(strPayload);
+      }
+
+      // console.log('get token with payload', payload);
+
       const response = await getTokenClient.post(url, payload);
       token = response.data;
       const decoded = jwt_decode(token);
-      console.log('New mophic token exp at', decoded.exp);
+      console.log('New mophic token expires at', decoded.exp);
 
-      cache.setex('token', token, decoded.exp - 60); // set expire before 60s
+      cache.setex(TOKEN_KEY, token, decoded.exp - 60); // set expire before 60s
+      cache.set(AUTH_PAYLOAD_KEY, JSON.stringify(payload));
     } catch (error) {
       console.error(error);
     }
@@ -74,7 +85,10 @@ const instance = axios.create(defaultOptions);
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
   if (!token) {
-    return Promise.reject({ message: 'no token' });
+    return Promise.reject({
+      message:
+        'Cannot create token, please check the username and password configuration.',
+    });
   }
 
   // console.log('interceptors.request', `Bearer ${token}`);
@@ -112,7 +126,10 @@ const instanceEpidem = axios.create(epidemOptions);
 instanceEpidem.interceptors.request.use(async (config) => {
   const token = await getToken();
   if (!token) {
-    return Promise.reject({ message: 'no token' });
+    return Promise.reject({
+      message:
+        'Cannot create token, please check the username and password configuration.',
+    });
   }
   // console.log('interceptors.request', `Bearer ${token}`);
   config.headers.Authorization = `Bearer ${token}`;
@@ -149,7 +166,10 @@ const instancePhr = axios.create(phrOptions);
 instancePhr.interceptors.request.use(async (config) => {
   const token = await getToken();
   if (!token) {
-    return Promise.reject({ message: 'no token' });
+    return Promise.reject({
+      message:
+        'Cannot create token, please check the username and password configuration.',
+    });
   }
   config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -186,7 +206,10 @@ const instanceClaim = axios.create(claimOptions);
 instanceClaim.interceptors.request.use(async (config) => {
   const token = await getToken();
   if (!token) {
-    return Promise.reject({ message: 'no token' });
+    return Promise.reject({
+      message:
+        'Cannot create token, please check the username and password configuration.',
+    });
   }
   config.headers.Authorization = `Bearer ${token}`;
   return config;

@@ -1,7 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const config = require('./config');
-const routerProxy = require('./api/proxy');
+const webRouter = require('./web');
+const apiRouter = require('./api');
 const useAuth = require('./middleware/use-auth');
 const redisClient = require('./cache');
 const keygen = require('./helper/keygen');
@@ -9,7 +10,8 @@ const pkgJson = require('../package.json');
 const http = require('./http');
 
 async function main() {
-  console.log(`MOPH IC Proxy v.${pkgJson.version}`);
+  const appName = `MOPH IC Proxy v.${pkgJson.version}`;
+  console.log(appName);
   try {
     await redisClient.createClient();
   } catch (error) {
@@ -33,9 +35,18 @@ async function main() {
     )
   );
   // parse body to json
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+  app.set('x-powered-by', false);
+  // set the view engine to ejs
+  app.set('view engine', 'ejs');
+  app.set('views', process.cwd() + '/src/views');
 
-  app.use(useAuth.validateApikey, routerProxy);
+  app.get('/favicon.ico', (req, res) => res.status(204));
+
+  app.use(webRouter.init(appName));
+
+  app.use(useAuth.validateApikey, apiRouter.init());
 
   // handle 404
   app.use((req, res, next) => {
