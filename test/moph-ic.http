@@ -1,6 +1,6 @@
 @HOST=http://localhost:3000
 @ENDPONT=mophic
-@API-KEY=RG3TG6Z-DAZMWTQ-NJ2N6QG-WWE5NZE
+@API-KEY=
 @CID=
 
 ### ImmunizationTarget

@@ -1,6 +1,6 @@
 @HOST=http://localhost:3000
 @ENDPONT=claim
-@API-KEY=RG3TG6Z-DAZMWTQ-NJ2N6QG-WWE5NZE
+@API-KEY=
 @CID=
 
 ### API ส่งข้อมูลการใช้บริการ DMHT ในการเคลม OPD
