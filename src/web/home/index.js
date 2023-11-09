@@ -34,6 +34,13 @@ function init(appName) {
         doc: 'https://docs.google.com/document/d/1iiybB2y7NJkEhXTdS4DbYe3-Fs7aka7MlEns81lzODQ/edit',
       });
     }
+    if (config.FDH_API) {
+      apis.push({
+        name: 'MOPH Financial Data Hub (FDH)',
+        url: '/api/v1/data_hub/16_files?endpoint=fdh',
+        doc: 'https://drive.google.com/file/d/17XqRmSEOnXoJVwzmCwteuVdy-Gp_SUyW',
+      });
+    }
     res.render('index', {
       title: appName,
       useApiKey: config.USE_API_KEY,

@@ -10,6 +10,7 @@ const {
   MOPH_CLAIM_API,
   MOPH_PHR_API,
   EPIDEM_API,
+  FDH_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
   TOKEN_KEY,
@@ -229,6 +230,46 @@ instanceClaim.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
+const fdhOptions = {
+  baseURL: FDH_API,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  httpsAgent,
+};
+
+const instanceFDH = axios.create(fdhOptions);
+
+instanceFDH.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (!token) {
+    return Promise.reject({
+      message:
+        'Cannot create token, please check the username and password configuration.',
+    });
+  }
+  // console.log('interceptors.request', `Bearer ${token}`);
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+instanceFDH.interceptors.response.use(null, async (error) => {
+  if (error.config && error.response && error.response.status === 401) {
+    const token = await getToken({ force: true });
+    if (!token) {
+      console.log('Cancal Retry from interceptors.response', error);
+      return Promise.reject(error);
+    }
+
+    // console.log('interceptors.response', `Bearer ${token}`);
+    error.config.headers.Authorization = `Bearer ${token}`;
+    // console.log('Retry from interceptors.response');
+    return axios.request(error.config);
+  }
+
+  return Promise.reject(error);
+});
+
 function getClient(endpoint = 'mophic') {
   switch (endpoint) {
     case 'epidem':
@@ -237,6 +278,8 @@ function getClient(endpoint = 'mophic') {
       return instancePhr;
     case 'claim':
       return instanceClaim;
+    case 'fdh':
+      return instanceFDH;
     default:
       return instance;
   }
@@ -247,6 +290,7 @@ module.exports = {
   clientEpidem: instanceEpidem,
   clientPhr: instanceClaim,
   clientClaim: instancePhr,
+  clientFDH: instanceFDH,
   getToken,
   getClient,
 };

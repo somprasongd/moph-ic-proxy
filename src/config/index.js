@@ -7,11 +7,10 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 const MOPH_CLAIM_API = process.env.MOPH_CLAIM_API || null;
 const MOPH_PHR_API = process.env.MOPH_PHR_API || null;
 const EPIDEM_API = process.env.EPIDEM_API || null;
+const FDH_API = process.env.FDH_API || null;
 const MOPH_C19_API = process.env.MOPH_C19_API;
 const MOPH_C19_AUTH = process.env.MOPH_C19_AUTH || process.env.MOPH_C19_API;
 const MOPH_C19_AUTH_SECRET = process.env.MOPH_C19_AUTH_SECRET || '$jwt@moph#';
-// const MOPH_USER = process.env.MOPH_USER;
-// const MOPH_PASSWD = process.env.MOPH_PASSWD;
 const MOPH_HCODE = process.env.MOPH_HCODE;
 const USE_API_KEY = process.env.USE_API_KEY
   ? process.env.USE_API_KEY === 'true'
@@ -19,13 +18,7 @@ const USE_API_KEY = process.env.USE_API_KEY
 const TOKEN_KEY = 'moph-ic-token';
 const AUTH_PAYLOAD_KEY = 'moph-ic-auth-payload';
 
-const requireds = [
-  'MOPH_C19_API',
-  'MOPH_C19_AUTH_SECRET',
-  'MOPH_USER',
-  'MOPH_PASSWD',
-  'MOPH_HCODE',
-];
+const requireds = ['MOPH_C19_AUTH', 'MOPH_C19_AUTH_SECRET', 'MOPH_HCODE'];
 
 const errors = [];
 
@@ -57,6 +50,7 @@ module.exports = {
   MOPH_CLAIM_API,
   MOPH_PHR_API,
   EPIDEM_API,
+  FDH_API,
   MOPH_C19_API,
   MOPH_C19_AUTH,
   MOPH_HCODE,
