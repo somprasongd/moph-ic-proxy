@@ -2,7 +2,7 @@
 
 ## MOPH IC API Document
 
-https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/edit
+<https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/edit>
 
 ## Development
 
@@ -14,6 +14,7 @@ https://docs.google.com/document/d/1Inyhfrte0pECsD8YoForTL2W8B2hOxezf0GpTGEjJr8/
     "MOPH_CLAIM_API": "https://uat-moph-nhso.inet.co.th",
     "MOPH_PHR_API": "https://phr1.moph.go.th",
     "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
+    "FDH_API": "https://fdh.moph.go.th",
     "MOPH_C19_API": "https://cloud4.hosxp.net",
     "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
     "MOPH_C19_AUTH_SECRET": "secret_key",
@@ -46,7 +47,12 @@ npm run dev
 - Create `moph-ic-proxy.env` file
 
 ```env
-MOPH_C19_API=https://cvp1.moph.go.th
+MOPH_CLAIM_API=https://uat-moph-nhso.inet.co.th
+MOPH_PHR_API=https://phr1.moph.go.th
+EPIDEM_API=https://epidemcenter.moph.go.th/epidem
+FDH_API=https://uat-fdh.inet.co.th
+MOPH_C19_API=https://cloud4.hosxp.net
+MOPH_C19_AUTH=https://cvp1.moph.go.th
 MOPH_C19_AUTH_SECRET=secret_key
 MOPH_HCODE=your-hcode
 USE_API_KEY=true_or_false_default_is_true
