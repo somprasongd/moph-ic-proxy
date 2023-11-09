@@ -37,7 +37,7 @@ function init(appName) {
     if (config.FDH_API) {
       apis.push({
         name: 'MOPH Financial Data Hub (FDH)',
-        url: '/api/v1/data_hub/16_files?endpoint=fdh',
+        url: 'api/v1/data_hub/16_files?endpoint=fdh',
         doc: 'https://drive.google.com/file/d/17XqRmSEOnXoJVwzmCwteuVdy-Gp_SUyW',
       });
     }
