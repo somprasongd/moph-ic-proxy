@@ -35,7 +35,7 @@ async function main() {
     )
   );
   // parse body to json
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.set('x-powered-by', false);
   // set the view engine to ejs
