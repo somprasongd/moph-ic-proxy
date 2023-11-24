@@ -60,20 +60,23 @@ router.all('*', async (req, res, next) => {
                 for (const v of element) {
                   form.append(key, fs.createReadStream(v.filepath), {
                     filename: v.originalFilename,
-                    // contentType: v.mimetype,
+                    contentType: v.mimetype,
                   });
                 }
               } else {
                 form.append(key, element.filepath, {
                   filename: element.originalFilename,
-                  // contentType: v.mimetype,
+                  contentType: v.mimetype,
                 });
               }
             }
           }
         }
-
-        respone = await client.post(url, form);
+        respone = await client.post(url, form, {
+          headers: {
+            'Content-Type': req.get('Content-Type'),
+          },
+        });
       } else {
         next(new Error(`Unsupport Content-Type: ${contentTypes[0]}`));
       }
