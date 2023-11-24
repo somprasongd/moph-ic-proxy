@@ -1,4 +1,4 @@
-FROM node:14.15.0-alpine
+FROM node:18.18-alpine
 LABEL maintainer="somprasong.damyos@gmail.com"
 ENV NODE_ENV=production
 # Expose ports (for orchestrators and dynamic reverse proxies)
