@@ -1,10 +1,7 @@
 const { createHmac } = require('crypto');
-const config = require('../config');
 
-function hashPassword(password) {
-  return createHmac('sha256', config.MOPH_C19_AUTH_SECRET)
-    .update(password)
-    .digest('hex');
+function hashPassword(password, secretKey) {
+  return createHmac('sha256', secretKey).update(password).digest('hex');
 }
 
 module.exports = {

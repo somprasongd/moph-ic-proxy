@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/change-password', async (req, res, next) => {
   const { username, password } = req.body;
+  const app = req.query.app || 'mophic'; // mophic or fdh
 
   if (!username) {
     return res.status(400).json({
@@ -22,7 +23,7 @@ router.post('/change-password', async (req, res, next) => {
     });
   }
 
-  const token = await http.getToken({ force: true, username, password });
+  const token = await http.getToken({ force: true, username, password, app });
   if (!token) {
     return res.status(401).json({
       error: {

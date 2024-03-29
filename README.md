@@ -11,15 +11,39 @@
 ```json
 {
   "env": {
-    "MOPH_CLAIM_API": "https://uat-moph-nhso.inet.co.th",
-    "MOPH_PHR_API": "https://phr1.moph.go.th",
-    "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
-    "FDH_API": "https://fdh.moph.go.th",
-    "MOPH_C19_API": "https://cloud4.hosxp.net",
-    "MOPH_C19_AUTH": "https://cvp1.moph.go.th",
-    "MOPH_C19_AUTH_SECRET": "secret_key",
     "MOPH_HCODE": "your-hcode",
     "USE_API_KEY": "true_or_false_default_is_true"
+  }
+}
+```
+
+To edit the secret key for hash password, add env like this:
+
+```diff
+{
+  "env": {
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": "true_or_false_default_is_true"
++    "MOPH_IC_AUTH_SECRET": "new_ecret_key",
++    "FDH_AUTH_SECRET": "new_ecret_key",
+  }
+}
+```
+
+To edit the API destination URL, add env like this:
+
+```diff
+{
+  "env": {
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": "true_or_false_default_is_true"
++    "MOPH_CLAIM_API": "https://claim-nhso.moph.go.th", // UAT: "https://uat-moph-nhso.inet.co.th",
++    "MOPH_PHR_API": "https://phr1.moph.go.th",
++    "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
++    "FDH_API": "https://fdh.moph.go.th", // UAT: https://uat-fdh.inet.co.th
++    "FDH_AUTH": "https://fdh.moph.go.th",
++    "MOPH_IC_API": "https://cvp1.moph.go.th",
++    "MOPH_IC_AUTH": "https://cvp1.moph.go.th",
   }
 }
 ```
@@ -47,15 +71,39 @@ npm run dev
 - Create `moph-ic-proxy.env` file
 
 ```env
-MOPH_CLAIM_API=https://uat-moph-nhso.inet.co.th
-MOPH_PHR_API=https://phr1.moph.go.th
-EPIDEM_API=https://epidemcenter.moph.go.th/epidem
-FDH_API=https://uat-fdh.inet.co.th
-MOPH_C19_API=https://cloud4.hosxp.net
-MOPH_C19_AUTH=https://cvp1.moph.go.th
-MOPH_C19_AUTH_SECRET=secret_key
 MOPH_HCODE=your-hcode
 USE_API_KEY=true_or_false_default_is_true
+```
+
+To edit the secret key for hash password, add env like this:
+
+```diff
+{
+  "env": {
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": "true_or_false_default_is_true"
++    "MOPH_IC_AUTH_SECRET": "new_ecret_key",
++    "FDH_AUTH_SECRET": "new_ecret_key",
+  }
+}
+```
+
+To edit the API destination URL, add env like this:
+
+```diff
+{
+  "env": {
+    "MOPH_HCODE": "your-hcode",
+    "USE_API_KEY": "true_or_false_default_is_true"
++    "MOPH_CLAIM_API": "https://claim-nhso.moph.go.th", // UAT: "https://uat-moph-nhso.inet.co.th",
++    "MOPH_PHR_API": "https://phr1.moph.go.th",
++    "EPIDEM_API": "https://epidemcenter.moph.go.th/epidem",
++    "FDH_API": "https://fdh.moph.go.th", // UAT: https://uat-fdh.inet.co.th
++    "FDH_AUTH": "https://fdh.moph.go.th",
++    "MOPH_IC_API": "https://cvp1.moph.go.th",
++    "MOPH_IC_AUTH": "https://cvp1.moph.go.th",
+  }
+}
 ```
 
 - To deploy with this production Compose file you can run

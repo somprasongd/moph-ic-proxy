@@ -11,8 +11,11 @@ const {
   MOPH_PHR_API,
   EPIDEM_API,
   FDH_API,
-  MOPH_C19_API,
-  MOPH_C19_AUTH,
+  FDH_AUTH,
+  FDH_AUTH_SECRET,
+  MOPH_IC_API,
+  MOPH_IC_AUTH,
+  MOPH_IC_AUTH_SECRET,
   TOKEN_KEY,
   AUTH_PAYLOAD_KEY,
 } = require('../config');
@@ -22,7 +25,7 @@ const httpsAgent = new https.Agent({
 });
 
 const getTokenClient = axios.create({
-  baseURL: MOPH_C19_AUTH,
+  baseURL: MOPH_IC_AUTH,
   httpsAgent,
 });
 axiosRetry(getTokenClient, {
@@ -30,25 +33,44 @@ axiosRetry(getTokenClient, {
   retryDelay: axiosRetry.exponentialDelay,
 });
 
+const getTokenClientFDH = axios.create({
+  baseURL: FDH_AUTH,
+  httpsAgent,
+});
+axiosRetry(getTokenClientFDH, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+});
+
 async function getToken(
-  options = { force: false, username: '', password: '' }
+  options = { force: false, username: '', password: '', app: 'mophic' }
 ) {
-  const { force = false, username = '', password = '' } = options;
+  const {
+    force = false,
+    username = '',
+    password = '',
+    app = 'mophic',
+  } = options;
   // console.log('gettoken with options:', options);
+  const tokenKey = `${app}${TOKEN_KEY}`;
+  const authPayloadKey = `${app}${AUTH_PAYLOAD_KEY}`;
+  const secretKey = app === 'mophic' ? MOPH_IC_AUTH_SECRET : FDH_AUTH_SECRET;
+
   let token = null;
   if (force) {
-    cache.del('token');
+    cache.del(tokenKey);
   } else {
-    token = await cache.get(TOKEN_KEY);
+    token = await cache.get(tokenKey);
   }
   if (token === null || token === '') {
     try {
       const url = `/token?Action=get_moph_access_token`;
       let payload = {};
       if (username !== '' && password !== '') {
-        payload = createAuthPayload(username, password);
+        payload = createAuthPayload(username, password, secretKey);
       } else {
-        const strPayload = await cache.get(AUTH_PAYLOAD_KEY);
+        const strPayload = await cache.get(authPayloadKey);
+        // not logged in
         if (!strPayload) {
           return null;
         }
@@ -56,14 +78,14 @@ async function getToken(
       }
 
       // console.log('get token with payload', payload);
-
-      const response = await getTokenClient.post(url, payload);
+      const client = app === 'mophic' ? getTokenClient : getTokenClientFDH;
+      const response = await client.post(url, payload);
       token = response.data;
       const decoded = jwt_decode(token);
-      console.log('New mophic token expires at', decoded.exp);
+      console.log(`New ${app} token expires at`, decoded.exp);
 
-      cache.setex(TOKEN_KEY, token, decoded.exp - 60); // set expire before 60s
-      cache.set(AUTH_PAYLOAD_KEY, JSON.stringify(payload));
+      cache.setex(tokenKey, token, decoded.exp - 60); // set expire before 60s
+      cache.set(authPayloadKey, JSON.stringify(payload));
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +94,7 @@ async function getToken(
 }
 
 const defaultOptions = {
-  baseURL: MOPH_C19_API,
+  baseURL: MOPH_IC_API,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -84,7 +106,7 @@ const instance = axios.create(defaultOptions);
 // const controller = new AbortController();
 
 instance.interceptors.request.use(async (config) => {
-  const token = await getToken();
+  const token = await getToken({ app: 'mophic' });
   if (!token) {
     return Promise.reject({
       message:
@@ -99,7 +121,7 @@ instance.interceptors.request.use(async (config) => {
 
 instance.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
-    const token = await getToken({ force: true });
+    const token = await getToken({ force: true, app: 'mophic' });
     if (!token) {
       console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);
@@ -125,7 +147,7 @@ const epidemOptions = {
 const instanceEpidem = axios.create(epidemOptions);
 
 instanceEpidem.interceptors.request.use(async (config) => {
-  const token = await getToken();
+  const token = await getToken({ app: 'mophic' });
   if (!token) {
     return Promise.reject({
       message:
@@ -139,7 +161,7 @@ instanceEpidem.interceptors.request.use(async (config) => {
 
 instanceEpidem.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
-    const token = await getToken({ force: true });
+    const token = await getToken({ force: true, app: 'mophic' });
     if (!token) {
       console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);
@@ -165,7 +187,7 @@ const phrOptions = {
 const instancePhr = axios.create(phrOptions);
 
 instancePhr.interceptors.request.use(async (config) => {
-  const token = await getToken();
+  const token = await getToken({ app: 'mophic' });
   if (!token) {
     return Promise.reject({
       message:
@@ -182,7 +204,7 @@ instancePhr.interceptors.response.use(null, async (error) => {
     error.response &&
     (error.response.status === 401 || error.response.status === 501)
   ) {
-    const token = await getToken({ force: true });
+    const token = await getToken({ force: true, app: 'mophic' });
     if (!token) {
       console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);
@@ -205,7 +227,7 @@ const claimOptions = {
 const instanceClaim = axios.create(claimOptions);
 
 instanceClaim.interceptors.request.use(async (config) => {
-  const token = await getToken();
+  const token = await getToken({ app: 'mophic' });
   if (!token) {
     return Promise.reject({
       message:
@@ -218,7 +240,7 @@ instanceClaim.interceptors.request.use(async (config) => {
 
 instanceClaim.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
-    const token = await getToken({ force: true });
+    const token = await getToken({ force: true, app: 'mophic' });
     if (!token) {
       console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);
@@ -241,7 +263,7 @@ const fdhOptions = {
 const instanceFDH = axios.create(fdhOptions);
 
 instanceFDH.interceptors.request.use(async (config) => {
-  const token = await getToken();
+  const token = await getToken({ app: 'fdh' });
   if (!token) {
     return Promise.reject({
       message:
@@ -255,7 +277,7 @@ instanceFDH.interceptors.request.use(async (config) => {
 
 instanceFDH.interceptors.response.use(null, async (error) => {
   if (error.config && error.response && error.response.status === 401) {
-    const token = await getToken({ force: true });
+    const token = await getToken({ force: true, app: 'fdh' });
     if (!token) {
       console.log('Cancal Retry from interceptors.response', error);
       return Promise.reject(error);

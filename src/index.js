@@ -10,24 +10,31 @@ const pkgJson = require('../package.json');
 const http = require('./http');
 
 async function main() {
-  const appName = `MOPH IC Proxy v.${pkgJson.version}`;
+  const appName = `MOPH API Proxy v.${pkgJson.version}`;
   console.log(appName);
+
   try {
     await redisClient.createClient();
   } catch (error) {
     throw new Error(`Fatal error: ${error.message}`);
   }
 
-  const app = express();
+  // create all tokens from saved username and password
+  http.getToken({ force: true, app: 'mophic' });
+  http.getToken({ force: true, app: 'fdh' });
 
+  // generate api key
   if (config.USE_API_KEY) {
     try {
-      await keygen.init(app);
+      await keygen.init();
     } catch (error) {
       throw new Error(`Fatal error: ${error.message}`);
     }
   }
-  http.getToken({ force: true });
+
+  // init web server
+  const app = express();
+
   // use middlewares
   app.use(
     morgan(
