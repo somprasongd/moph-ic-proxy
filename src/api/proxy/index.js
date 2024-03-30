@@ -13,9 +13,10 @@ router.all('*', async (req, res, next) => {
     res.sendStatus(405); // Method Not Allowed
     return;
   }
-  const { query } = req;
 
-  const client = http.getClient(query['endpoint']);
+  const { query } = req;
+  const endpoint = req.header('x-api-endpoint') || query['endpoint'];
+  const client = http.getClient(endpoint);
 
   if (query['endpoint']) {
     delete query['endpoint'];
