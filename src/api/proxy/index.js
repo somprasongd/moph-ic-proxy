@@ -8,11 +8,13 @@ const http = require('../../http');
 const router = express.Router();
 
 router.all('*', async (req, res, next) => {
-  // allow get and post
-  if (req.method !== 'GET' && req.method !== 'POST') {
-    res.sendStatus(405); // Method Not Allowed
-    return;
-  }
+  // // allow get and post and put
+  // if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT') {
+  //   res
+  //     .sendStatus(405)
+  //     .json({ message: 'proxy error: allow only GET, POST and PUT method.' }); // Method Not Allowed
+  //   return;
+  // }
 
   const { query } = req;
   const endpoint = req.header('x-api-endpoint') || query['endpoint'];
@@ -32,7 +34,7 @@ router.all('*', async (req, res, next) => {
 
     if (req.method === 'GET') {
       respone = await client.get(url);
-    } else {
+    } else if (req.method === 'POST') {
       contentTypes = req.get('Content-Type').split(';');
       if (contentTypes[0] === 'application/json') {
         respone = await client.post(url, req.body);
@@ -81,6 +83,18 @@ router.all('*', async (req, res, next) => {
       } else {
         next(new Error(`Unsupport Content-Type: ${contentTypes[0]}`));
       }
+    } else if (req.method === 'PUT') {
+      respone = await client.put(url, req.body);
+    } else if (req.method === 'PATCH') {
+      respone = await client.patch(url, req.body);
+    } else if (req.method === 'DELETE') {
+      respone = await client.delete(url);
+    } else {
+      res.sendStatus(405).json({
+        message:
+          'proxy error: allow only GET, POST, PUT, PATCH and DELETE method.',
+      }); // Method Not Allowed
+      return;
     }
 
     return res.send(respone.data);
