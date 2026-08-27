@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-27
+
 ### Added
 
 - Unit test suite (`npm test`, Node's built-in `node:test` — no new dependencies): config env parsing (incl. `HTTP_RETRIES` edge cases), password hashing, auth payload, cache in-memory fallback (incl. the far-future TTL overflow regression), API-key generation/verification, `x-api-key` middleware, the `/api/auth/change-password` route, token lifecycle (cache, force refresh, in-flight dedup, 401-retry-once), and the proxy itself (endpoint selection without leaking the `endpoint` param upstream, JSON/multipart body pass-through, gzip error bodies, 404/405/415/504 handling, 1MB stream integrity, correlation log format) — all against an in-process fake upstream (`test/helpers/fake-upstream.js`).
@@ -164,10 +166,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release: Express proxy for the MOPH IC API with token management.
 
-<!-- ลิงก์เปรียบเทียบเวอร์ชัน (กำหนดเมื่อมี git tag แล้ว — ปัจจุบันมี tag เพียง v2.0.1, v2.1.0, v2.1.1) -->
+<!-- ลิงก์เปรียบเทียบเวอร์ชัน (อิงจาก git tag) -->
 
-[Unreleased]: https://github.com/somprasongd/moph-api-proxy/compare/v2.1.1...HEAD
-[2.2.0]: https://github.com/somprasongd/moph-api-proxy/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/somprasongd/moph-api-proxy/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/somprasongd/moph-api-proxy/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/somprasongd/moph-api-proxy/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/somprasongd/moph-api-proxy/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/somprasongd/moph-api-proxy/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/somprasongd/moph-api-proxy/releases/tag/v2.0.1
