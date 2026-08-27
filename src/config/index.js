@@ -1,6 +1,14 @@
 // กำหนดค่า environment และตรวจสอบตัวแปรสำคัญก่อนเริ่มระบบ
 // const { createHmac } = require('crypto');
 
+// แปลง HTTP_RETRIES โดยเฉพาะ เพราะ Number('') ได้ 0
+// ซึ่งจะกลายเป็นการปิด retry โดยไม่ตั้งใจเมื่อตัวแปรถูกปล่อยว่างใน env file
+const parsedRetries = Number(process.env.HTTP_RETRIES);
+const httpRetries =
+  process.env.HTTP_RETRIES && Number.isFinite(parsedRetries)
+    ? parsedRetries
+    : 1;
+
 const env = {
   APP_PORT: process.env.APP_PORT || 3000,
   REDIS_HOST: process.env.REDIS_HOST,
@@ -21,6 +29,10 @@ const env = {
     ? process.env.USE_API_KEY === 'true'
     : true,
   HTTP_TIMEOUT_MS: process.env.HTTP_TIMEOUT_MS || 30000,
+  // จำนวน retry กรณี network error/timeout (default 1 = พยายามรวม 2 ครั้ง
+  // เพื่อไม่ให้เวลารวมยาวเกินที่ HIS รอได้ ปรับเพิ่มได้ผ่าน env)
+  HTTP_RETRIES: httpRetries,
+  BODY_LIMIT: process.env.BODY_LIMIT || '6mb',
   TOKEN_KEY: '-auth-token',
   AUTH_PAYLOAD_KEY: '-auth-payload',
 };

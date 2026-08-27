@@ -3,9 +3,17 @@ const express = require('express');
 
 const router = express.Router();
 const http = require('../../http');
+const { ALLOWED_APPS } = require('../../helper/auth-payload');
 
 router.all('/change-password', async (req, res) => {
   const app = req.query.app || 'mophic'; // mophic or fdh
+  if (!ALLOWED_APPS.includes(app)) {
+    return res.render('change-password', {
+      app: 'mophic',
+      status: 'error',
+      message: `Invalid app, must be one of ${ALLOWED_APPS.join(', ')}`,
+    });
+  }
   const payload = {
     app: app,
     status: '',

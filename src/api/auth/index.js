@@ -1,12 +1,20 @@
 // จัดการการเปลี่ยนรหัสผ่านและสร้างโทเคนใหม่ให้ระบบภายนอก
 const express = require('express');
 const http = require('../../http');
+const { ALLOWED_APPS } = require('../../helper/auth-payload');
 
 const router = express.Router();
 
 router.post('/change-password', async (req, res, next) => {
   const { username, password } = req.body;
   const app = req.query.app || 'mophic'; // mophic or fdh
+  if (!ALLOWED_APPS.includes(app)) {
+    return res.status(400).json({
+      error: {
+        message: `Invalid app, must be one of ${ALLOWED_APPS.join(', ')}`,
+      },
+    });
+  }
 
   if (!username) {
     // ต้องระบุ username เพื่อทราบบัญชีที่จะเปลี่ยนโทเคน

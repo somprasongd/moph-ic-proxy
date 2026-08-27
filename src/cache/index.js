@@ -40,11 +40,15 @@ const memorySet = (key, value, expiresAtMs = null) =>
     memoryStore.set(key, record);
     if (expiresAtMs) {
       const delay = Math.max(expiresAtMs - Date.now(), 0);
-      const timer = setTimeout(() => {
-        memoryStore.delete(key);
-        memoryTimers.delete(key);
-      }, delay);
-      memoryTimers.set(key, timer);
+      // setTimeout รับ delay ได้สูงสุด ~24.8 วัน (32-bit) ถ้าเกิน Node จะบีบเหลือ 1ms
+      // กรณี TTL ยาวเกินขอบ ให้ข้าม timer แล้วพึ่งการเช็ค expiresAt แบบ lazy ใน memoryGet แทน
+      if (delay <= 2147483647) {
+        const timer = setTimeout(() => {
+          memoryStore.delete(key);
+          memoryTimers.delete(key);
+        }, delay);
+        memoryTimers.set(key, timer);
+      }
     }
     resolve('OK');
   });
@@ -222,4 +226,26 @@ const del = (key) => {
   });
 };
 
-module.exports = { createClient, get, set, setex, del };
+// บอก backend ที่ใช้อยู่ขณะนี้ (สำหรับ /healthz)
+const getBackend = () => backend;
+
+// ปิดการเชื่อมต่อ redis และล้าง timer ของ in-memory store
+// ใช้ตอนปิดโปรแกรมแบบ graceful shutdown
+const close = () =>
+  new Promise((resolve) => {
+    for (const timer of memoryTimers.values()) {
+      clearTimeout(timer);
+    }
+    memoryTimers.clear();
+    if (!redisClient) {
+      return resolve();
+    }
+    try {
+      redisClient.quit(() => resolve());
+    } catch (error) {
+      console.error('Error closing redis client:', error.message || error);
+      resolve();
+    }
+  });
+
+module.exports = { createClient, get, set, setex, del, getBackend, close };

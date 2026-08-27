@@ -3,6 +3,9 @@ const config = require('../config');
 const cache = require('../cache');
 const { hashPassword } = require('./password');
 
+// ระบบที่ขอ token ได้มีแค่ 2 ค่านี้ ใช้ตรวจพารามิเตอร์ app จากผู้ใช้
+const ALLOWED_APPS = ['mophic', 'fdh'];
+
 function createAuthPayload(username, password, secretKey) {
   // แปลงข้อมูลผู้ใช้ให้กลายเป็น payload ที่ API ภายนอกต้องการ
   return {
@@ -28,6 +31,7 @@ async function isCurrentAuthPayload(app = 'mophic', username, password) {
 }
 
 module.exports = {
+  ALLOWED_APPS,
   createAuthPayload,
   isCurrentAuthPayload,
 };

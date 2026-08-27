@@ -17,6 +17,13 @@ services:
       - REDIS_PORT=6379
     volumes:
       - authorized_key:/app/.authorized_key
+    healthcheck:
+      # busybox wget มีใน node:24-alpine อยู่แล้ว
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
       - redis
     networks:

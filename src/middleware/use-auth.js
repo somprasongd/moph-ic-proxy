@@ -24,8 +24,9 @@ function validateApikey(req, res, next) {
     }
 
     // ป้องกันไม่ให้ query key หลุดไปยังระบบปลายทาง
-    delete req.query['x-api-key'];
   }
+  // ลบทิ้งเสมอแม้ปิดการตรวจ api key เพื่อไม่ส่ง key ของผู้ใช้ไปให้ upstream
+  delete req.query['x-api-key'];
   next();
 }
 

@@ -1,4 +1,5 @@
-FROM node:18.18-alpine
+# Node 24 (Krypton) = Active LTS (Node 18 เป็น EOL แล้ว)
+FROM node:24-alpine
 LABEL maintainer="somprasong.damyos@gmail.com"
 ENV NODE_ENV=production
 # Expose ports (for orchestrators and dynamic reverse proxies)

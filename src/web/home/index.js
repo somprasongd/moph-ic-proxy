@@ -55,7 +55,7 @@ function init(appName) {
         description:
           'ศูนย์กลางข้อมูลด้านการเงิน Financial Data Hub (FDH) กระทรวงสาธารณสุข',
         proxy_host: config.FDH_API,
-        url: 'api/v1/data_hub/16_files?endpoint=fdh',
+        url: 'api/v2/data_hub/16_files?endpoint=fdh',
         doc: 'https://drive.google.com/file/d/17XqRmSEOnXoJVwzmCwteuVdy-Gp_SUyW',
       });
     }
