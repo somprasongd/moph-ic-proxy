@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const uuidAPIKey = require('uuid-apikey');
+const apiKeyHelper = require('./api-key');
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -24,11 +24,11 @@ async function init() {
   try {
     // พยายามอ่าน secret ที่เคยสร้างไว้ก่อน
     secret = await readFile(keygenFile, { encoding: 'utf8' });
-    apiKey = uuidAPIKey.toAPIKey(secret);
+    apiKey = apiKeyHelper.uuidToApiKey(secret);
   } catch (readError) {
     try {
       // ถ้าไม่มีให้สุ่ม key ใหม่แล้วบันทึกเป็นไฟล์
-      const key = uuidAPIKey.create();
+      const key = apiKeyHelper.create();
       await writeFile(keygenFile, key.uuid, { encoding: 'utf8' });
       secret = key.uuid;
       apiKey = key.apiKey;
@@ -43,11 +43,12 @@ async function init() {
 
 function verify(apiKey) {
   // ตรวจสอบรูปแบบและเทียบ UUID เพื่อยืนยันว่า key ถูกต้อง
-  if (!apiKey || !uuidAPIKey.isAPIKey(apiKey)) {
+  if (!apiKey || !apiKeyHelper.isApiKey(apiKey)) {
     return false;
   }
 
-  if (uuidAPIKey.toUUID(apiKey) !== secret) {
+  // คีย์รูปแบบถูกแต่ข้อมูลเสียหาย (parity ไม่ผ่าน) จะได้ null กลับมา
+  if (apiKeyHelper.apiKeyToUuid(apiKey) !== secret) {
     return false;
   }
 

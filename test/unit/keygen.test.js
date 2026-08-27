@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const uuidAPIKey = require('uuid-apikey');
+const apiKeyHelper = require('../../src/helper/api-key');
 
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'moph-proxy-keygen-'));
 process.env.API_KEY_FILE = path.join(tmpDir, 'keys', '.access.key');
@@ -17,7 +17,7 @@ test('init สร้างไฟล์ key ครั้งแรกและ ver
   await keygen.init();
 
   const apiKey = keygen.getApiKey();
-  assert.ok(uuidAPIKey.isAPIKey(apiKey), 'ต้องอยู่ในรูปแบบ UUIDAPIKey');
+  assert.ok(apiKeyHelper.isApiKey(apiKey), 'ต้องอยู่ในรูปแบบ API key');
   assert.ok(
     fs.existsSync(process.env.API_KEY_FILE),
     'ต้องมีไฟล์เก็บ uuid ไว้ใช้ต่อหลัง restart'
@@ -26,7 +26,7 @@ test('init สร้างไฟล์ key ครั้งแรกและ ver
 });
 
 test('verify คีย์รูปแบบถูกแต่เป็นคนละตัวต้อง false', async () => {
-  const other = uuidAPIKey.create();
+  const other = apiKeyHelper.create();
   assert.equal(keygen.verify(other.apiKey), false);
 });
 

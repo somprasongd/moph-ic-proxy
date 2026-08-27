@@ -17,10 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `src/helper/keygen.js` key-file location can be overridden via the `API_KEY_FILE` environment variable (used by tests to point at a temp directory; production default unchanged).
 - `src/index.js` `main()` is exported and returns the HTTP server; it only auto-runs when executed directly (`node src/index.js`) — production behavior unchanged.
+- API-key generation/verification moved from the `uuid-apikey` dependency to a vendored byte-compatible implementation (`src/helper/api-key.js`, UUID ↔ Base32-Crockford with parity checksum, using `crypto.randomUUID()`). Verified against the original module with a 10,000-round fuzz (0 mismatches) and frozen known vectors in `test/fixtures/api-key-vectors.json`; keys already issued to callers keep verifying unchanged.
 
 ### Fixed
 
 - `GET /favicon.ico` hung forever (handler set status 204 but never ended the response, and never called `next()`), holding a socket per request — caught by the new integration tests; now returns 204 immediately.
+
+### Security
+
+- Removed the `uuid-apikey` dependency, which pulled in `uuid@8.3.2` with two moderate advisories and no upstream fix — `npm audit` is now clean (0 vulnerabilities).
 
 ## [2.2.0] - 2026-08-27
 
