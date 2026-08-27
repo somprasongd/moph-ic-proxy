@@ -55,7 +55,8 @@ async function main() {
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
 
-  app.get('/favicon.ico', (req, res) => res.status(204));
+  // ต้อง .end() ด้วย ไม่งั้น connection ค้างไม่จบ (เคยเป็นสาเหตุให้ request แขวนตาย)
+  app.get('/favicon.ico', (req, res) => res.status(204).end());
 
   // liveness: ตอบ 200 เสมอถ้า process ยังรับ request ได้ (ให้ container restart เฉพาะเมื่อค้างจริง)
   app.get('/healthz', (req, res) => {
@@ -174,6 +175,15 @@ async function main() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
+
+  // คืน server ให้ caller (integration test) รู้ port จริงที่ OS จัดให้
+  return server;
 }
 
-main();
+// รันตรง ๆ เฉพาะเมื่อสั่ง `node src/index.js`
+// (integration test require ไฟล์นี้แล้วเรียก main() เองแทน)
+if (require.main === module) {
+  main();
+}
+
+module.exports = { main };

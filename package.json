@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test \"test/unit/*.test.js\"",
+    "test": "node --test \"test/unit/*.test.js\" \"test/integration/*.test.js\"",
     "dev": "nodemon src/index.js"
   },
   "keywords": [],

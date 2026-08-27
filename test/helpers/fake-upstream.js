@@ -16,6 +16,7 @@ const makeJwt = (expiresInSeconds = 3600) => {
 function createFakeUpstream(options = {}) {
   const tokenDelayMs = options.tokenDelayMs || 0;
   const tokenTtlSeconds = options.tokenTtlSeconds || 3600;
+  const slowMs = options.slowMs || 5000;
 
   // ออก token เป็นเวอร์ชันกันหัวชน เพื่อให้ทดสอบ refresh แยก token เก่า/ใหม่ออกจากกันได้
   let tokenVersion = 0;
@@ -113,7 +114,7 @@ function createFakeUpstream(options = {}) {
 
       // ช้ากว่า HTTP_TIMEOUT_MS ของ test เพื่อทดสอบ 504
       if (pathname === '/api/slow') {
-        return setTimeout(() => json(200, { ok: true }), 5000);
+        return setTimeout(() => json(200, { ok: true }), slowMs);
       }
 
       // เส้นทางอื่น ๆ ตอบ 404 เลียนแบบ express
