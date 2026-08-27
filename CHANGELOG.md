@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- CI actions bumped to Node.js 24 runtime versions — `actions/checkout@v7`, `actions/setup-node@v7` (silences the Node.js 20 deprecation warning; Node 20 is removed from runners on 2026-09-16) — and `appleboy/ssh-action` pinned to `v1.2.5` instead of the floating `master` ref.
+
 ## [2.3.0] - 2026-08-27
 
 ### Added
