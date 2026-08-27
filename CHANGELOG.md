@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- CI builds a version-tagged image (`ghcr.io/.../moph-api-proxy:X.Y.Z`) when a `v*` git tag is pushed, built from the exact commit the tag points at — enabling rollback by pinning the compose `image:` tag instead of rebuilding an old commit. Pushes to `main` keep building `:latest`; the SSH deploy still runs only for `main` pushes.
+
 ### Changed
 
 - CI actions bumped to Node.js 24 runtime versions — `actions/checkout@v7`, `actions/setup-node@v7` (silences the Node.js 20 deprecation warning; Node 20 is removed from runners on 2026-09-16) — and `appleboy/ssh-action` pinned to `v1.2.5` instead of the floating `master` ref.

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 jobs:
   ci:
@@ -21,14 +23,32 @@ jobs:
         run: npm test
       - name: Login to GitHub Container Registry
         run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ secrets.CR_USERNAME }} --password-stdin
+      # push main -> image :latest / push tag vX.Y.Z -> image :X.Y.Z (build จาก commit ที่ tag ชี้)
+      # รัน tag ไม่ push latest เพื่อกัน tag เก่าที่ push ทีหลัง overwriting latest ของ main
+      - name: Compute image tags
+        id: meta
+        run: |
+          IMAGE="ghcr.io/${{ secrets.CR_USERNAME }}/moph-api-proxy"
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "tags=$IMAGE:${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tags=$IMAGE:latest" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build
-        run: docker build -t ghcr.io/${{ secrets.CR_USERNAME }}/moph-api-proxy:latest .
+        run: |
+          IFS=',' read -ra TAGS <<< "${{ steps.meta.outputs.tags }}"
+          ARGS=(); for t in "${TAGS[@]}"; do ARGS+=(-t "$t"); done
+          docker build "${ARGS[@]}" .
       - name: Push
-        run: docker image push ghcr.io/${{ secrets.CR_USERNAME }}/moph-api-proxy:latest
+        run: |
+          IFS=',' read -ra TAGS <<< "${{ steps.meta.outputs.tags }}"
+          for t in "${TAGS[@]}"; do docker image push "$t"; done
 
   cd:
     runs-on: ubuntu-latest
     needs: ci
+    # deploy เฉพาะ push main — push tag เพิ่ง deploy ไปแล้วจาก branch run
+    if: github.ref_type == 'branch'
     steps:
       - name: executing remote ssh commands
         uses: appleboy/ssh-action@v1.2.5
