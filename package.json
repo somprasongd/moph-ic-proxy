@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon src/test.js",
+    "test": "node --test \"test/unit/*.test.js\"",
     "dev": "nodemon src/index.js"
   },
   "keywords": [],

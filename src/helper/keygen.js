@@ -7,13 +7,11 @@ const uuidAPIKey = require('uuid-apikey');
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
-const keygenFile = path.join(
-  __dirname,
-  '..',
-  '..',
-  '.authorized_key',
-  '.access.key'
-);
+// กำหนดตำแหน่งไฟล์ key ได้ผ่าน API_KEY_FILE เพื่อใช้ใน unit test
+// โดยไม่ต้องเขียนทับไฟล์จริงในโปรเจกต์
+const keygenFile =
+  process.env.API_KEY_FILE ||
+  path.join(__dirname, '..', '..', '.authorized_key', '.access.key');
 
 if (!fs.existsSync(path.dirname(keygenFile))) {
   // สร้างโฟลเดอร์เก็บไฟล์ key ล่วงหน้าหากยังไม่มี

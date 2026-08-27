@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Unit test suite (`npm test`, Node's built-in `node:test` — no new dependencies): config env parsing (incl. `HTTP_RETRIES` edge cases), password hashing, auth payload, cache in-memory fallback (incl. the far-future TTL overflow regression), API-key generation/verification, `x-api-key` middleware, the `/api/auth/change-password` route, token lifecycle (cache, force refresh, in-flight dedup, 401-retry-once), and the proxy itself (endpoint selection without leaking the `endpoint` param upstream, JSON/multipart body pass-through, gzip error bodies, 404/405/415/504 handling, 1MB stream integrity, correlation log format) — all against an in-process fake upstream (`test/helpers/fake-upstream.js`).
+- CI runs `npm test` on Node 24 before building the image; `actions/checkout` bumped to v4.
+
+### Changed
+
+- `src/helper/keygen.js` key-file location can be overridden via the `API_KEY_FILE` environment variable (used by tests to point at a temp directory; production default unchanged).
+
 ## [2.2.0] - 2026-08-27
 
 ### Added

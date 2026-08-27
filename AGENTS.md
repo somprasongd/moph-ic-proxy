@@ -10,6 +10,7 @@ An Express proxy in front of several MOPH (Thai Ministry of Public Health) APIs.
 
 ```bash
 npm run dev          # start dev server (nodemon src/index.js)
+npm test             # run unit tests (node --test "test/unit/*.test.js")
 docker compose up -d # start local Redis only (for token cache sharing)
 ```
 
@@ -18,7 +19,7 @@ docker compose up -d # start local Redis only (for token cache sharing)
   - On each commit: record user-facing changes under `[Unreleased]`.
   - On each release: move `[Unreleased]` entries under a new version heading with the date (matching the `package.json` bump), then create the git tag (`vX.Y.Z`).
 - Body limits mirror the FDH docs: JSON up to `BODY_LIMIT` (default `6mb`, doc allows 5MB/request); multipart uploads (e.g. 16-files import `/api/v2/data_hub/16_files`, ≤50MB total) are capped at 60MB in the proxy (`src/api/proxy/index.js`).
-- There is no test suite. `npm test` points to a nonexistent `src/test.js`. The files in `test/*.http` are VS Code REST Client requests for exercising a running server, not automated tests.
+- Unit tests live in `test/unit/*.test.js` and use Node's built-in `node:test` + `node:assert/strict` (no test framework dependency). Each file runs in its own process and modules read env at `require` time — so every file sets the env it needs at the top, **before** requiring `src/` (e.g. point `MOPH_IC_AUTH`/`MOPH_IC_API` at a fake upstream). `test/helpers/fake-upstream.js` is an in-process HTTP server that mimics the MOPH upstreams (`/token`, `/api/echo`, 401-once `/api/stale`, gzip error, slow, 1MB binary) and records every request it receives. `API_KEY_FILE` overrides where `keygen` stores the API-key file so tests never touch `.authorized_key/.access.key`. The files in `test/*.http` are VS Code REST Client requests for exercising a running server, not automated tests.
 - Production: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` (uses `moph-api-proxy.env`, image from ghcr.io). CI (`.github/workflows/cicd.yml`) builds/pushes the image and redeploys the dev server via SSH on every push to `main`.
 
 ## Architecture
